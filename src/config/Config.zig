@@ -2485,6 +2485,20 @@ keybind: Keybinds = .{},
     else => .false,
 },
 
+/// The clipboard format used when copying text via `copy-on-select`.
+///
+/// Valid values:
+///
+///   * `mixed` - Copy as both plain text and HTML, allowing the receiving
+///     application to choose the appropriate format. This is the default.
+///   * `plain` - Copy as plain text only. Use this to prevent applications
+///     from receiving styled/HTML content when pasting.
+///   * `vt` - Copy with ANSI escape sequences preserved.
+///   * `html` - Copy as HTML only.
+///
+/// The default value is `mixed`.
+@"copy-on-select-format": inputpkg.Binding.Action.CopyToClipboard = .mixed,
+
 /// The action to take when the user right-clicks on the terminal surface.
 ///
 /// Valid values:

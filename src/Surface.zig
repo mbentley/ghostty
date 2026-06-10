@@ -305,6 +305,7 @@ const DerivedConfig = struct {
     clipboard_paste_bracketed_safe: bool,
     clipboard_codepoint_map: configpkg.Config.RepeatableClipboardCodepointMap,
     copy_on_select: configpkg.CopyOnSelect,
+    copy_on_select_format: input.Binding.Action.CopyToClipboard,
     right_click_action: configpkg.RightClickAction,
     middle_click_action: configpkg.MiddleClickAction,
     confirm_close_surface: configpkg.ConfirmCloseSurface,
@@ -385,6 +386,7 @@ const DerivedConfig = struct {
             .clipboard_paste_bracketed_safe = config.@"clipboard-paste-bracketed-safe",
             .clipboard_codepoint_map = try config.@"clipboard-codepoint-map".clone(alloc),
             .copy_on_select = config.@"copy-on-select",
+            .copy_on_select_format = config.@"copy-on-select-format",
             .right_click_action = config.@"right-click-action",
             .middle_click_action = config.@"middle-click-action",
             .confirm_close_surface = config.@"confirm-close-surface",
@@ -2398,7 +2400,7 @@ fn setSelectionAndCopy(self: *Surface, sel: terminal.Selection) !void {
         .clipboard => try self.copySelectionToClipboards(
             sel,
             &.{ .standard, .selection },
-            .mixed,
+            self.config.copy_on_select_format,
         ),
 
         // The selection clipboard is set if supported, otherwise the standard.
@@ -2410,7 +2412,7 @@ fn setSelectionAndCopy(self: *Surface, sel: terminal.Selection) !void {
             try self.copySelectionToClipboards(
                 sel,
                 &.{clipboard},
-                .mixed,
+                self.config.copy_on_select_format,
             );
         },
     }
