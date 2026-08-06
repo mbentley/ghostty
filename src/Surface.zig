@@ -4032,7 +4032,26 @@ pub fn mouseButtonCallback(
                     null,
                 )) |result_| {
                     if (result_) |result| {
-                        press_selection = result.selection;
+                        // Our path-matching regex allows a match to cross a
+                        // literal space to capture filenames that contain
+                        // one (e.g. "My Documents/notes.txt"). Scheme URLs
+                        // (https://, mailto:, etc.) never contain a raw
+                        // space, so a match that does is always a path
+                        // match, not a URL match. Trusting such a match here
+                        // means a double-click can silently expand across
+                        // unrelated text on either side of the space (e.g.
+                        // selecting an entire line of shell output because
+                        // one word happens to look like the start of a
+                        // path), which defeats `selection-word-chars`. Fall
+                        // back to the standard word selection in that case.
+                        const match = try screen.selectionString(self.alloc, .{
+                            .sel = result.selection,
+                            .trim = false,
+                        });
+                        defer self.alloc.free(match);
+                        if (std.mem.indexOfScalar(u8, match, ' ') == null) {
+                            press_selection = result.selection;
+                        }
                     }
                 } else |_| {
                     // Ignore any errors, likely regex errors.
